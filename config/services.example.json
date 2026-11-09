@@ -1,0 +1,70 @@
+{
+  "site": {
+    "name": "myDashboard",
+    "subtitle": "homelab · example",
+    "description": "A calm operational dashboard for your homelab.",
+    "timeZone": "Europe/Zurich"
+  },
+  "lifecycleFilters": [
+    { "id": "all", "label": "All services", "shortLabel": "All" },
+    { "id": "always-on", "label": "Always on", "shortLabel": "Always on" },
+    { "id": "scheduled", "label": "Scheduled", "shortLabel": "Scheduled" },
+    { "id": "on-demand", "label": "On demand", "shortLabel": "On demand" }
+  ],
+  "categories": [
+    { "id": "infrastructure", "title": "Home & Infrastructure", "description": "Core access, security, notifications, and backups." },
+    { "id": "monitoring", "title": "Monitoring", "description": "Availability, telemetry, logs, and network health." },
+    { "id": "media", "title": "Media & Photos", "description": "Libraries, live television, and display experiences." },
+    { "id": "tools", "title": "Tools & Productivity", "description": "Everyday utilities, publishing, and assistant tools." },
+    { "id": "automation", "title": "Automation", "description": "Schedulers, signals, updates, and background workers." },
+    { "id": "discovered", "title": "Discovered", "description": "Compose projects not yet classified in the manifest." }
+  ],
+  "quickLinks": [
+    { "id": "router", "name": "Router", "description": "Network settings", "url": "https://192.168.1.1/", "icon": "router" },
+    { "id": "nas", "name": "NAS", "description": "Storage administration", "url": "https://nas.example.com/", "icon": "hard-drive" },
+    { "id": "tailscale", "name": "Tailscale Admin", "description": "Devices and access", "url": "https://login.tailscale.com/admin/machines", "icon": "network" }
+  ],
+  "footer": {
+    "year": 2026,
+    "name": "Patrick Baumgartner",
+    "url": "https://github.com/patbaumgartner/my-dashboard",
+    "message": "Crafted with ❤️"
+  },
+  "services": [
+    {
+      "id": "mydashboard",
+      "name": "myDashboard",
+      "description": "Homelab service control center",
+      "icon": "/logo.svg",
+      "url": "https://dashboard.example.com/",
+      "checkUrl": "http://127.0.0.1:8080/healthz",
+      "project": "mydashboard",
+      "category": "infrastructure",
+      "lifecycle": "always-on"
+    },
+    {
+      "id": "logs",
+      "name": "Logs",
+      "description": "Live container logs, started only when needed",
+      "icon": "/icons/logs.svg",
+      "url": "https://logs.example.com/",
+      "checkUrl": "http://logs:8080/",
+      "project": "logs",
+      "category": "monitoring",
+      "lifecycle": "on-demand",
+      "control": "power",
+      "startupTimeoutSeconds": 120
+    },
+    {
+      "id": "nightly-backup",
+      "name": "Nightly backup",
+      "description": "Runs in its maintenance window only",
+      "project": "nightly-backup",
+      "category": "automation",
+      "lifecycle": "scheduled",
+      "schedule": "Daily 02:00–04:00",
+      "windowStart": "02:00",
+      "windowEnd": "04:00"
+    }
+  ]
+}

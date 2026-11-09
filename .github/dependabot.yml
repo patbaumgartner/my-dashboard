@@ -1,0 +1,87 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: /
+  schedule:
+    interval: weekly
+    day: monday
+    time: "06:00"
+    timezone: Europe/Zurich
+  open-pull-requests-limit: 10
+  reviewers:
+  - patbaumgartner
+  assignees:
+  - patbaumgartner
+  commit-message:
+    prefix: deps(go)
+    include: scope
+  labels:
+  - dependencies
+  - go
+- package-ecosystem: npm
+  directory: /
+  schedule:
+    interval: weekly
+    day: monday
+    time: "06:00"
+    timezone: Europe/Zurich
+  open-pull-requests-limit: 10
+  reviewers:
+  - patbaumgartner
+  assignees:
+  - patbaumgartner
+  commit-message:
+    prefix: deps(npm)
+    include: scope
+  labels:
+  - dependencies
+  - javascript
+  groups:
+    svelte-vite:
+      patterns:
+      - svelte
+      - svelte-check
+      - "@sveltejs/*"
+      - vite
+      - typescript
+      - "@tsconfig/*"
+- package-ecosystem: docker
+  directory: /
+  schedule:
+    interval: weekly
+    day: monday
+    time: "06:00"
+    timezone: Europe/Zurich
+  open-pull-requests-limit: 5
+  reviewers:
+  - patbaumgartner
+  assignees:
+  - patbaumgartner
+  commit-message:
+    prefix: deps(docker)
+    include: scope
+  labels:
+  - dependencies
+  - docker
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: weekly
+    day: monday
+    time: "06:00"
+    timezone: Europe/Zurich
+  open-pull-requests-limit: 5
+  reviewers:
+  - patbaumgartner
+  assignees:
+  - patbaumgartner
+  commit-message:
+    prefix: ci
+    include: scope
+  labels:
+  - dependencies
+  - github-actions
+  groups:
+    docker-actions:
+      patterns:
+      - docker/*

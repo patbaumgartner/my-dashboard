@@ -1,0 +1,92 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# myDashboard – production compose file
+#
+# Pulls the pre-built image from GitHub Container Registry. Both containers run
+# the same image in different modes:
+#
+#   docker-gateway  The only container that mounts docker.sock. Exposes four
+#                   allowlisted operations (list, start, stop, restart) on a
+#                   private internal network.
+#   mydashboard     The web application. Talks to Docker only via the gateway.
+#
+# Quick start
+# ───────────
+#   cp .env.example .env
+#   cp config/services.example.json config/services.json   # then edit it
+#   docker compose pull
+#   docker compose up -d
+#
+# The dashboard has no login and can stop containers. It is published on
+# loopback only; put it behind a reverse proxy or VPN you trust, never on the
+# open internet.
+#
+# To build from source instead, use:
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up --build
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Docker API gateway (the only container with docker.sock) ───────────────
+  docker-gateway:
+    image: ghcr.io/patbaumgartner/my-dashboard:${VERSION:-latest}
+    container_name: mydashboard-docker-gateway
+    restart: unless-stopped
+    # docker.sock is usually root:root 0660, so group 0 is required to reach it.
+    # The uid stays non-root. The :ro bind only protects the socket inode - it
+    # does not restrict Docker API calls, so the gateway's own route allowlist
+    # is the actual boundary.
+    user: "65532:0"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      MYDASHBOARD_DOCKER_SOCKET: /var/run/docker.sock
+      MYDASHBOARD_MANIFEST: /app/config/services.json
+      MYDASHBOARD_GATEWAY_ADDRESS: :2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${MYDASHBOARD_MANIFEST_FILE:-./config/services.example.json}:/app/config/services.json:ro
+    networks:
+      - docker-api
+    command: ["gateway"]
+    healthcheck:
+      test: ["CMD", "/app/mydashboard", "gateway-healthcheck"]
+      interval: 30s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
+
+  # ── Web application ──────────────────────────────────────────────────────────
+  mydashboard:
+    image: ghcr.io/patbaumgartner/my-dashboard:${VERSION:-latest}
+    container_name: mydashboard
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      docker-gateway:
+        condition: service_healthy
+    environment:
+      MYDASHBOARD_DOCKER_ENDPOINT: http://docker-gateway:2375
+      MYDASHBOARD_MANIFEST: /app/config/services.json
+      MYDASHBOARD_STATIC_DIR: /app/public
+    volumes:
+      - ${MYDASHBOARD_MANIFEST_FILE:-./config/services.example.json}:/app/config/services.json:ro
+      # Service icons referenced as /icons/<name> in the manifest.
+      - ${MYDASHBOARD_ICONS_DIR:-./public/icons}:/app/public/icons:ro
+    tmpfs:
+      - /tmp
+    ports:
+      - "127.0.0.1:${MYDASHBOARD_PORT:-8080}:8080"
+    networks:
+      - docker-api
+      - default
+
+networks:
+  docker-api:
+    internal: true
