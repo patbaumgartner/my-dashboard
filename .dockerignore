@@ -1,0 +1,27 @@
+# Keep the build context minimal: it is uploaded to the Docker daemon in full,
+# so anything listed here can never be copied into an image.
+
+# Secrets
+.env
+*.env
+
+# VCS and CI
+.git
+.github
+.gitignore
+.gitattributes
+
+# Build output and dependencies (rebuilt inside the image)
+node_modules
+dist
+*.log
+
+# Editor / OS noise
+.vscode
+.idea
+.DS_Store
+
+# Docs and compose files are not needed inside the image
+*.md
+docker-compose*.yml
+LICENSE

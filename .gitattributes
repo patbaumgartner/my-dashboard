@@ -1,0 +1,22 @@
+# Normalise line endings so every platform builds the same image.
+* text=auto eol=lf
+
+*.go          text eol=lf
+*.ts          text eol=lf
+*.svelte      text eol=lf
+*.json        text eol=lf
+*.yml         text eol=lf
+*.yaml        text eol=lf
+*.md          text eol=lf
+*.sh          text eol=lf
+Dockerfile    text eol=lf
+
+# Binary files: no line-ending conversion
+*.png         binary
+*.jpg         binary
+*.ico         binary
+*.webp        binary
+
+# Generated
+package-lock.json linguist-generated=true
+go.sum            linguist-generated=true
